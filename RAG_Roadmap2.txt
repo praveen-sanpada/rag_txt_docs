@@ -1,0 +1,220 @@
+🔥 Updated Complete Roadmap & Architecture for RAG Application with Multi-DB + Multi-File Support
+=======================================================================================================================================
+
+1. Core Functionalities Added
+---------------------------------------------------------------------------------------------------------------------------------------
+1) Multi-Database Integration:
+    A) MySQL: For structured relational data storage (user info, logs, metadata, SQL dataset queries)
+    B) MongoDB: For flexible document storage, JSON-like schema storage, raw document storage
+
+2) Multi-File Upload & Processing:
+    A) Support CSV, JSON, TXT, PDF, Image, Video uploads
+    B) URL scraping to ingest content from web pages
+
+3) Universal Document Loader:
+    A) Loaders for all above file types + DB connectors to ingest data into vector store
+
+4) Extended Vector Store:
+    A) Index vectors from all file types and DB data
+
+5) Advanced RAG Chains:
+    A) Handle multimodal data (text + images + videos metadata) for retrieval and answering
+
+6) Scalable API & UI:
+    A) APIs to upload any data, trigger ingestion pipelines, query RAG system
+
+=======================================================================================================================================
+
+2. Updated Folder Structure
+---------------------------------------------------------------------------------------------------------------------------------------
+
+rag-app/
+│
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── routes/
+│   │   │   │   ├── document_routes.py      # Upload + process PDF, TXT, CSV, JSON, Images, Video
+│   │   │   │   ├── query_routes.py         # User queries, chat interface
+│   │   │   │   ├── sql_routes.py           # NL-to-SQL query generation and execution
+│   │   │   │   ├── websearch_routes.py     # External web search integration
+│   │   │   │   ├── db_routes.py            # DB ingestion & query APIs (MySQL, MongoDB)
+│   │   │   │   └── upload_routes.py        # Multi-file type upload API handlers
+│   │   │   └── dependencies.py             # DB sessions, embedding clients, vector store clients
+│   │   │
+│   │   ├── core/
+│   │   │   ├── embeddings.py                # SBERT + multimodal embeddings (text + image/video features)
+│   │   │   ├── vectorstore.py               # Vector store (FAISS/Chroma) wrapper + multi-index support
+│   │   │   ├── document_loader.py           # Multi-type loaders: PDF, TXT, CSV, JSON, Image, Video, URL scraping
+│   │   │   ├── db_connectors.py             # MySQL connector, MongoDB client setup, ORM models
+│   │   │   ├── rag_chain.py                  # Main RAG pipeline combining multimodal data
+│   │   │   ├── sql_chain.py                  # NL-to-SQL chain and query execution logic
+│   │   │   ├── websearch.py                  # Google/Bing Search API wrapper
+│   │   │   ├── llm_client.py                 # OpenAI GPT and/or local LLM client wrappers
+│   │   │   ├── multimodal_processing.py      # Feature extraction for images/videos (optional)
+│   │   │   └── ingestion_pipeline.py         # Orchestrate ingestion of files + DB data to vector store
+│   │   │
+│   │   ├── models/                           # ORM models for MySQL and document schema for MongoDB
+│   │   │   ├── mysql_models.py
+│   │   │   ├── mongo_models.py
+│   │   │   └── __init__.py
+│   │   │
+│   │   ├── services/
+│   │   │   ├── document_service.py          # Logic for document processing + ingestion
+│   │   │   ├── query_service.py             # RAG query handling
+│   │   │   ├── sql_service.py               # NL-to-SQL service
+│   │   │   ├── db_service.py                # DB ingestion + query service
+│   │   │   └── websearch_service.py         # Web search + augment service
+│   │   │
+│   │   ├── utils/
+│   │   │   ├── file_utils.py                 # File validation, chunking, metadata extraction
+│   │   │   ├── url_scraper.py                # URL scraping utilities
+│   │   │   ├── video_image_processing.py     # Video frame extraction, image feature extraction helpers
+│   │   │   ├── logging.py
+│   │   │   └── validation.py
+│   │   │
+│   │   ├── main.py                           # FastAPI app start with all routes
+│   │   └── flask_app.py                      # Optional Flask UI routes (if needed)
+│   │
+│   ├── tests/                               # Tests for all above modules, including DB & ingestion
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   └── README.md
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── ChatWindow.js                 # Chat UI for querying RAG
+│   │   │   ├── FileUpload.js                 # Upload various file types
+│   │   │   ├── QueryInput.js                  # Query input component
+│   │   │   ├── SqlQueryBuilder.js             # Visual SQL query builder (optional)
+│   │   │   └── WebSearchInput.js              # Web search UI component
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── HomePage.js
+│   │   │   ├── PDFChatbotPage.js
+│   │   │   ├── SQLAssistantPage.js
+│   │   │   ├── WebSearchPage.js
+│   │   │   └── DBIngestionPage.js             # UI for uploading DB data & files
+│   │   │
+│   │   ├── services/
+│   │   │   ├── apiClient.js                    # Axios/fetch wrapper for backend calls
+│   │   │   ├── documentService.js
+│   │   │   ├── queryService.js
+│   │   │   ├── sqlService.js
+│   │   │   └── dbService.js                     # Calls backend DB ingestion/query APIs
+│   │   │
+│   │   ├── utils/
+│   │   ├── App.js
+│   │   └── index.js
+│   ├── package.json
+│   ├── .env
+│   ├── Dockerfile
+│   └── README.md
+│
+├── streamlit_demo/
+│   ├── app.py
+│   ├── utils.py
+│   ├── requirements.txt
+│   └── README.md
+│
+├── docker-compose.yml
+├── .gitignore
+└── README.md
+
+=======================================================================================================================================
+
+3. Key Enhancements in Architecture
+---------------------------------------------------------------------------------------------------------------------------------------
+a) Multi-DB Support & Ingestion
+1) db_connectors.py handles connections for MySQL (using SQLAlchemy or mysqlclient) and MongoDB (via PyMongo or Motor async client).
+2) APIs in db_routes.py to support:
+    A) Ingest DB tables or collections as documents (with metadata) into vector store.
+    B) Run NL-to-SQL queries on MySQL with natural language interface.
+    C) Query MongoDB documents and ingest JSON data.
+3) ORM models define schemas for MySQL tables and MongoDB collections for data management.
+
+b) Universal File and URL Loader
+1) Extend document_loader.py to support:
+    A) CSV: Parse rows, convert to text chunks or table embeddings
+    B) JSON: Flatten nested JSON for text extraction
+    C) Images & Videos: Extract metadata, captions, or use pretrained image/video embedding models
+    D) URL Scraper: Fetch page HTML, extract main content, metadata for ingestion
+2) Upload handlers support all above files, validate and chunk accordingly.
+
+c) Multimodal Embeddings
+1) embeddings.py supports SBERT for text, and hooks for image/video embedding models (CLIP, OpenAI’s image embeddings).
+2) Optionally add multimodal_processing.py for feature extraction or frame sampling from videos.
+
+d) Extended RAG Pipeline
+1) rag_chain.py orchestrates retrieval across text and multimodal indexes, combines results, sends to LLM for final response.
+2) Augment retrieval with web search results for freshness.
+
+e) Extended Frontend
+1) File uploader UI supports drag & drop or browse for multiple file types.
+2) DB ingestion UI allows connecting to MySQL/MongoDB and selecting tables/collections for ingestion.
+3) Query UI supports multimodal queries, SQL natural language queries, and web search queries.
+
+=======================================================================================================================================
+
+4. Data Flow (Expanded)
+---------------------------------------------------------------------------------------------------------------------------------------
+flowchart TD
+  User[User Interaction (Upload/Query)]
+  UI[Frontend React App / Streamlit Demo]
+  API[Backend API (FastAPI/Flask)]
+  DocLoader[Document Loader: PDF, CSV, JSON, Image, Video, URL Scraper]
+  DBConnectors[MySQL & MongoDB Connectors]
+  Embeddings[SBERT & Multimodal Embeddings]
+  VectorStore[FAISS / Chroma Vector Store]
+  RAGChain[RAG Pipeline + LangChain]
+  LLM[OpenAI GPT / Local LLM]
+  WebSearch[Google/Bing Web Search API]
+  DB[MySQL / MongoDB]
+  
+  User --> UI
+  UI --> API
+  API --> DocLoader
+  API --> DBConnectors
+  DocLoader --> Embeddings
+  DBConnectors --> Embeddings
+  Embeddings --> VectorStore
+  API --> VectorStore
+  API --> RAGChain
+  RAGChain --> VectorStore
+  RAGChain --> LLM
+  RAGChain --> WebSearch
+  DBConnectors --> DB
+  API --> DB
+  LLM --> API
+  API --> UI
+
+=======================================================================================================================================
+
+5. Additional Notes
+---------------------------------------------------------------------------------------------------------------------------------------
+1) Chunking strategy for large documents and media should be adjustable per file type.
+2) Metadata tagging (source file name, upload time, DB source) crucial for traceability.
+3) User authentication and permissions on DB ingestion and querying recommended.
+4) Monitoring ingestion pipeline with logs for debugging and performance.
+
+=======================================================================================================================================
+
+6. Suggested Libraries & Tools
+---------------------------------------------------------------------------------------------------------------------------------------
+| Function                   | Suggested Libraries / Tools                    |
+| -------------------------- | ---------------------------------------------- |
+| PDF/Text/CSV/JSON Loader   | PyPDF2, pdfplumber, pandas, json, python-magic |
+| URL Scraper                | requests, BeautifulSoup, newspaper3k           |
+| Image/Video Processing     | OpenCV, PIL, torchvision, ffmpeg-python        |
+| SBERT Embeddings           | sentence-transformers                          |
+| Image/Video Embeddings     | CLIP (OpenAI), OpenAI Image Embeddings         |
+| Vector Store               | FAISS, Chroma                                  |
+| MySQL Connector            | SQLAlchemy, mysqlclient                        |
+| MongoDB Connector          | PyMongo, Motor                                 |
+| FastAPI                    | fastapi, uvicorn                               |
+| Flask (optional UI routes) | Flask                                          |
+| Frontend                   | React, axios                                   |
+| Streamlit (demo)           | streamlit                                      |
+=======================================================================================================================================
